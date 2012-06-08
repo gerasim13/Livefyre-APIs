@@ -70,7 +70,7 @@ class Livefyre_Domain {
     
     public function create_site( $url ) {
         $request_url = 'http://' . $this->get_host() . '/sites/?actor_token=' . $this->user('system')->token();
-        $data = array('url' => urlencode($url));
+        $data = array('url' => $url);
         return $this->http->request( $request_url, array( 'method' => 'POST', 'data' => $data ) );
     }
     
