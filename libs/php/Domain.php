@@ -69,8 +69,9 @@ class Livefyre_Domain {
     }
     
     public function create_site( $url ) {
-        $request_url = 'http://' . $this->get_host() . '/sites/?url=' . urlencode($url) . '&actor_token=' . $this->user('system')->token();
-        return $this->http->request( $request_url, array( 'method' => 'POST' ) );
+        $request_url = 'http://' . $this->get_host() . '/sites/?actor_token=' . $this->user('system')->token();
+        $data = array('url' => urlencode($url));
+        return $this->http->request( $request_url, array( 'method' => 'POST', 'data' => $data ) );
     }
     
     public function set_user_affiliation( $user_id, $type, $scope = 'domain', $target_id = null ) {
