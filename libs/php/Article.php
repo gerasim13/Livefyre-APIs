@@ -26,15 +26,15 @@ class Livefyre_Article {
     }
     
     public function get_tags(){
-    	return $this->tags;
+        return $this->tags;
     }
     
     public function get_url(){
-    	return $this->url;
+        return $this->url;
     }
     
     public function get_title(){
-    	return $this->title;
+        return $this->title;
     }
     
     public function conversation() {
