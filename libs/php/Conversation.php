@@ -126,6 +126,7 @@ class Livefyre_Conversation {
         $config['siteId'] = $site->get_id();
         $config['articleId'] = $article->get_id();
         $config['el'] = $el;
+        $config['betaBanner'] = true;
         if ( $backplane ) {
             $add_backplane = 'if ( typeof(Backplane) != \'undefined\' ) { lf_config.backplane = Backplane; };';
         } else {
