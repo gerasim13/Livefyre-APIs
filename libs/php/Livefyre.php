@@ -326,8 +326,10 @@ class Livefyre {
         }
         // Check for null
         $conv = $this->get_conv( $article_id );
+        if( !isset( $conv ) ) {
+            return 'Cannot find conversation with that article ID.';
+        }    
         return $conv->to_html( $this->domain->get_host(), $site_id );
-
     }
 
 }

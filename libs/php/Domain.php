@@ -300,6 +300,15 @@ class Livefyre_Domain {
         return '<script type="text/javascript" src="http://zor.' . $this->get_livefyre_tld() . '/wjs/v3.0/javascripts/livefyre.js"></script>';
     }
     
+
+    /**
+     * Checks that login works for a particular cookie in V1
+     *
+     * @param   string  URL of the token
+     * @param   string  Path of the cookie
+     * @param   string  Token cookie's name
+     * @param   string  Domain cookie's name
+     */
     public function authenticate_js( $token_url = '', $cookie_path = '/', $token_cookie = null, $dname_cookie = null  ) {
         
         /*
@@ -352,6 +361,15 @@ class Livefyre_Domain {
     
     }
 
+
+    /**
+     * Checks that login works for a particular cookie in V3
+     *
+     * @param   string  URL of the token
+     * @param   string  Path of the cookie
+     * @param   string  Token cookie's name
+     * @param   string  Domain cookie's name
+     */
     public function authenticate_js_v3( $token_url = '', $cookie_path = '/', $token_cookie = null, $dname_cookie = null  ) {
         
         /*
@@ -403,7 +421,9 @@ class Livefyre_Domain {
     }
 
     /**
-     * See no use for this. Might be cut
+     * Accessor method to check the validity of the system token
+     *
+     * @param   string  Token to check
      */
     public function validate_system_token($token) {
         // This replaces the below - it uses JWT to verify that the token is valid for user id = 'system'
@@ -411,12 +431,22 @@ class Livefyre_Domain {
     }
 
     /**
-     * See no use for this. Might be cut
+     * Accessor method to check the validity of the server token
+     *
+     * @param   string  Token to check
      */
     public function validate_server_token($token) {
         return lftokenValidateServerToken($token, $this->get_key());
     }
 
+    /**
+     * Checks the the validity of a system token
+     *
+     * @param   string  Token to check
+     * @param   string  Key to hash with
+     * @param   string  Name of the domain
+     * @return  bool    Result of token validity
+     */
     private function lftokenValidateSystemToken($token, $key, $domain) {
         // This replaces the below - it uses JWT to verify that the token is valid for user id = 'system'
         $payload = JWT::decode($token, $key);
@@ -432,6 +462,13 @@ class Livefyre_Domain {
         return true;
     }
 
+    /**
+     * Checks the the validity of a system token
+     *
+     * @param   string  Token to check
+     * @param   string  Key to hash with
+     * @return  bool    Result of token validity
+     */
     private function lftokenValidateServerToken($token, $key) {
         $parts = explode( ',', $token );
         $signature = array_pop( $parts );
@@ -447,7 +484,14 @@ class Livefyre_Domain {
         return ( $signature == $temp ) && ( time() - $timestamp < $duration );
     }
 
-
+    /**
+     * Checks response to server token valididation
+     *
+     * @param   string  Payload data
+     * @param   string  Response to check against
+     * @param   string  Key to use for hashing
+     * @deprecated 
+     */
     function lftokenValidateResponse($data, $response, $key) {
         // This was a poorly chosen name, not a great interface.
         // Deprecated but here for backcompat

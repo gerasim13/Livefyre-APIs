@@ -4,6 +4,14 @@ define('LFTOKEN_MAX_AGE', 86400);
 require_once dirname(__FILE__) . '/JWT.php' ;
 
 class Livefyre_Token {
+
+    /**
+     * Creates a token for the given Livefyre User
+     * 
+     * @param   User    User to create the token for
+     * @param   int     Maximum age for the token's life span    
+     * @return  string  JWT encoded Livefyre token
+     */
     static function from_user($user, $max_age=LFTOKEN_MAX_AGE) {
         $secret = $user->get_domain()->get_key();
         $args = array(
@@ -18,12 +26,24 @@ class Livefyre_Token {
         return JWT::encode($args, $secret);
     }
 
+    /**
+     * Convert binary hash to BASE64 string
+     * 
+     * @param   string  Key to hash with
+     * @param   string  Data to hash    
+     * @return  string  Base64 string of hashed data
+     */
     function getHmacsha1Signature($key, $data) {
-        //convert binary hash to BASE64 string
         return base64_encode($this->hmacsha1($key, $data));
     }
 
-    // encrypt a base string w/ HMAC-SHA1 algorithm
+    /**
+     * Encrypt a base string w/ HMAC-SHA1 algorithm
+     * 
+     * @param   string  The key to hash with
+     * @param   string  The data to hash    
+     * @return  string  HMAC-SHA1'ed string
+     */
     function hmacsha1($key,$data) {
         $blocksize=64;
         $hashfunc='sha1';
@@ -37,6 +57,13 @@ class Livefyre_Token {
         return $hmac;
     }
 
+    /**
+     * XORs the 2 arrays
+     * 
+     * @param   array   User to create the token for
+     * @param   array   Maximum age for the token's life span    
+     * @return  string  List of results of the XOR
+     */
     private function xor_these($first, $second) {
         $results=array();
         for ($i=0; $i < strlen($first); $i++) {
@@ -45,12 +72,25 @@ class Livefyre_Token {
         return implode($results);
     }
 
+    /**
+     * Checks for commas
+     * 
+     * @param   string  String to check for commas  
+     * @return  bool    Whether or not the strings has commas
+     */
     function Livefyre_hasNoComma($str) {
         return !preg_match('/\,/', $str);
     }
 
+    /**
+     * Create the right data input for Livefyre authorization
+     * 
+     * @param   string  Current time
+     * @param   string  Token's duration
+     * @param   array   List of token args
+     * @return  string  Livefyre token data
+     */
     function lftokenCreateData($now, $duration, $args=array()) {
-        //Create the right data input for Livefyre authorization
         $filtered_args = array_filter($args, 'Livefyre_hasNoComma');
         if (count($filtered_args)==0 or count($args)>count($filtered_args)) {
             return -1;
@@ -61,6 +101,13 @@ class Livefyre_Token {
         return $data;
     }
 
+    /**
+     * Create a signed token from data
+     * 
+     * @param   string  Data to wrap up in the token
+     * @param   string  Key to hash with
+     * @return  string  Livefyre user token ecoded with base64
+     */
     function lftokenCreateToken($data, $key) {
         //Create a signed token from data
         $clientkey = $this->hmacsha1($key,"Client Key");
