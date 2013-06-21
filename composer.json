@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Livefyre": "libs/php/"
+            "": "libs/php/"
         }
     },
     "include-path": [
