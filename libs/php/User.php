@@ -15,7 +15,7 @@ class Livefyre_User {
      *
      * @var string
      */
-    private $uid;
+    private $uId;
 
     /**
      * Domain user is under
@@ -29,7 +29,7 @@ class Livefyre_User {
      *
      * @var string
      */
-    private $display_name;
+    private $displayName;
     
     /**
      * @param string    user identifier
@@ -39,10 +39,10 @@ class Livefyre_User {
      * @access public
      * @since Method available since Release 2.0.0
      */
-    public function __construct($uid, $domain, $display_name = null) {
+    public function __construct($uId, $domain, $displayName = null) {
         $this->uid = $uid;
         $this->domain = $domain;
-        $this->display_name = $display_name;
+        $this->displayName = $displayName;
     }
     
     /**
@@ -50,7 +50,7 @@ class Livefyre_User {
      * 
      * @return  string  Livefyre User ID
      */
-    public function get_uid() { 
+    public function getUId() { 
         return $this->uid;
     }
 
@@ -59,7 +59,7 @@ class Livefyre_User {
      * 
      * @return  string  Livefyre User's Domain
      */
-    public function get_domain() {
+    public function getDomain() {
         return $this->domain;
     }
 
@@ -68,8 +68,8 @@ class Livefyre_User {
      * 
      * @return  string  Livefyre User's display name
      */
-    public function get_display_name() {
-        return $this->display_name;
+    public function getDisplayName() {
+        return $this->displayName;
     }
     
     /**
@@ -78,7 +78,7 @@ class Livefyre_User {
      * @return  string  Livefyre User's JID
      */
     public function jid() {
-        return $this->$uid.'@'.$this->domain->get_host();
+        return $this->getUId() . '@' . $this->domain->getHost();
     }
     
     /**
@@ -87,10 +87,10 @@ class Livefyre_User {
      * @param   int     duration the token will survive
      * @return  string  Livefyre User Token
      */
-    public function token( $max_age = 86400 ) {
-        $domain_key = $this->domain->get_key();
-        assert('$domain_key != null /* Domain key is necessary to generate token */');
-        return Livefyre_Token::from_user($this, $max_age);
+    public function token( $maxAge = 86400 ) {
+        $domainKey = $this->domain->getKey();
+        assert('$domainKey != null /* Domain key is necessary to generate token */');
+        return Livefyre_Token::fromUser($this, $maxAge);
     }
     
     /**
@@ -99,12 +99,12 @@ class Livefyre_User {
      * @param   int     duration the token will survive
      * @return  string  Livefyre Site Identifier
      */
-    public function auth_json( $max_age = 86400 ) {
+    public function auth_JSON( $maxAge = 86400 ) {
         return json_encode( 
             array(
-                "token" => $this->token( $max_age ),
+                "token" => $this->token( $maxAge ),
                 "profile" => array(
-                    "display_name" => $this->get_display_name()
+                    "display_name" => $this->getDisplayName()
                 )
             )
         );
@@ -118,12 +118,12 @@ class Livefyre_User {
      * @param   string  Data to be pushed to our backed
      * @return  string[]    Body of the http response
      */
-    public function push( $user_data ) {
-        $post_data = array( 'data' => json_encode( $user_data ) );
+    public function push( $userData ) {
+        $post_data = array( 'data' => json_encode( $userData ) );
         $token_base64 = $this->token();
-        $domain = $this->get_domain( );
-        $remote_url = "http://{$domain->get_host()}/profiles/?actor_token={$token_base64}&id={$user_data['id']}";
-        $result = $domain->http->request($remote_url, array('method' => 'POST', 'data' => $post_data));
+        $domain = $this->getDomain( );
+        $remoteURL = "http://{$domain->get_host()}/profiles/?actor_token={$token_base64}&id={$user_data['id']}";
+        $result = $domain->http->request($remoteURL, array('method' => 'POST', 'data' => $postData));
         if (is_array( $result ) && isset($result['response']) && $result['response']['code'] == 200) {
             return $result['body'];
         } else {

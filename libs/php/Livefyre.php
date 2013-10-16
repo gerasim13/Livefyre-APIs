@@ -2,7 +2,7 @@
 
 require_once dirname(__FILE__) . '/Domain.php';
 require_once dirname(__FILE__) . '/Site.php';
-require_once dirname(__FILE__) . '/Conversation.php';
+// require_once dirname(__FILE__) . '/Conversation.php';
 
 /**
  * Livefyre Wrapper Class to help get widgets onto the page.
@@ -71,30 +71,30 @@ class Livefyre {
      * @access public
      * @since Method available since Release 2.0.0
      */
-    public function __construct( $domain_config, $site_config, $conv_configs, $onload = null, $version = 3 ) {
-        if ( isset( $site_config['site_id'] ) && isset( $site_config['site_key'] ) )  {
-            $this->site = new Livefyre_Site( $site_config['site_id'], $site_config['site_key'] );
+    public function __construct( $domainConfig, $siteConfig, $convConfigs, $onload = null, $version = 3 ) {
+        if ( isset( $siteConfig['site_id'] ) && isset( $siteConfig['site_key'] ) )  {
+            $this->site = new Livefyre_Site( $siteConfig['site_id'], $siteConfig['site_key'] );
         }
         else {
             echo 'A site must be created with a valid Site ID and Site Key.';
             return;
         }
-        if( isset( $domain_config['network'] ) && isset( $domain_config['key'] ) ) {
-            $this->domain = new Livefyre_Domain( $domain_config['network'],  $domain_config['key'], $options = $domain_config['options'] );    
+        if( isset( $domainConfig['network'] ) && isset( $domainConfig['key'] ) ) {
+            $this->domain = new Livefyre_Domain( $domainConfig['network'],  $domainConfig['key'], $options = $domainConfig['options'] );    
         }
         else {
-            $this->domain = new Livefyre_Domain( 'livefyre.com', $options = $domain_config['options'] );
+            $this->domain = new Livefyre_Domain( 'livefyre.com', $options = $domainConfig['options'] );
         }
-        if ( isset( $conv_configs ) ) {
+        if ( isset( $convConfigs ) ) {
             $this->convs = array();
-            foreach ( $conv_configs as $cur_conv ) {
+            foreach ( $convConfigs as $curConv ) {
                 $conv = new Livefyre_Conversation(
-                    $el = $cur_conv['el'],
-                    $article_id = $cur_conv['article_identifier'],
-                    $conv_name = $cur_conv['conv_name'],
-                    $tags = $cur_conv['tags'],
-                    $url = $cur_conv['url'],
-                    $title = $cur_conv['title']
+                    $el = $curConv['el'],
+                    $articleId = $curConv['article_identifier'],
+                    $convName = $curConv['conv_name'],
+                    $tags = $curConv['tags'],
+                    $url = $curConv['url'],
+                    $title = $curConv['title']
                 );
                 array_push( $this->convs, $conv );
             }
@@ -108,7 +108,7 @@ class Livefyre {
      * 
      * @param   Domain  The domain object to set
      */
-    public function set_domain( $domain ) {
+    public function setDomain( $domain ) {
         $this->domain = $domain;
     }
 
@@ -118,7 +118,7 @@ class Livefyre {
      * @return  Domain  The domain object contained in the Livefyre
      *                  class
      */
-    public function get_domain() {
+    public function getDomain() {
         return $this->domain;
     }
 
@@ -127,7 +127,7 @@ class Livefyre {
      * 
      * @param   Site    The site object to set
      */
-    public function set_site( $site ) {
+    public function setSite( $site ) {
         $this->site = $site;
     }
 
@@ -137,7 +137,7 @@ class Livefyre {
      * @return  Site    The site object contained in the Livefyre
      *                  class
      */
-    public function get_site() {
+    public function getSite() {
         return $this->site;
     }
 
@@ -146,7 +146,7 @@ class Livefyre {
      * 
      * @param   string  The onload string to set
      */
-    public function set_onload( $onload ) {
+    public function setOnload( $onload ) {
         $this->onload = $onload;
     }
 
@@ -156,7 +156,7 @@ class Livefyre {
      * @return  string  The string representing the Javascript
      *                  onload function name
      */
-    public function get_onload() {
+    public function getOnload() {
         return $this->onload;
     }
 
@@ -165,7 +165,7 @@ class Livefyre {
      * 
      * @param   Conversation    The conversation to add to the list
      */
-    public function add_conv( $conv ) {
+    public function addConv( $conv ) {
         array_push( $this->convs, $conv );
     }
 
@@ -176,9 +176,9 @@ class Livefyre {
      *                  to grab from the list
      * @return  Conversation    A conversation that matches the article ID passed in
      */
-    public function get_conv( $article_id ) {
+    public function get_conv( $articleId ) {
         foreach ( $this->convs as $conv ) {
-            if ( $conv->get_article_id() == $article_id ) {
+            if ( $conv->getArticleId() == $articleId ) {
                 return $conv;
             }
         }
@@ -194,12 +194,12 @@ class Livefyre {
      */
     public function get_global_config() {
 
-        $output = '{network: "' . $this->domain->get_host() . '"';
-        $authDelegate = $this->domain->get_authDelegate();
+        $output = '{network: "' . $this->domain->getHost() . '"';
+        $authDelegate = $this->domain->getAuthDelegate();
         if ( isset( $authDelegate ) ) {
             $output .= ', authDelegate: ' . $authDelegate;
         }
-        $strings = $this->domain->get_strings();
+        $strings = $this->domain->getStrings();
         if ( isset( $strings ) ) {
             $output .= ', strings: ' . $strings;
         }
@@ -218,11 +218,11 @@ class Livefyre {
      * 
      * @return  string  The string representing all conversations as javascript variables
      */
-    public function declare_configs() {
+    public function declareConfigs() {
 
         $output = '';
         foreach ( $this->convs as $conv ) {
-            $output .= 'var ' . $conv->get_conv_name() . ' = ' . json_encode( $conv->get_conv_config( $this->site->get_key(), $this->site->get_id() ) );
+            $output .= 'var ' . $conv->getConvName() . ' = ' . json_encode( $conv->getConvConfig( $this->site->getKey(), $this->site->getId() ) );
         }
         return $output;
 
@@ -237,15 +237,15 @@ class Livefyre {
      * 
      * @return  string  The string representing the javascipt loading code
      */
-    public function livefyre_embed_code() {
+    public function livefyreEmbedCode() {
 
         if ( $this->version < 3 ) {
             if ( !isset( $this->convs[0] ) ) {
                 return "Unable to produce a V1 conversation. No conversations exist.";
             }
-            return $this->livefyre_embed_code_v1( $this->convs[0] );
+            return $this->livefyreEmbedCodeV1( $this->convs[0] );
         }
-        return $this->livefyre_embed_code_v3();
+        return $this->livefyreEmbedCode_v3();
 
     }
 
@@ -254,10 +254,10 @@ class Livefyre {
      * 
      * @return  string  The string representing the javascript loading code for Version 1
      */
-    public function livefyre_embed_code_v1( $conv ) {
+    public function livefyreEmbedCodeV1( $conv ) {
 
-        return $conv->to_initjs( $this->domain->get_host(), $this->site->get_id(), $this->site->get_key, 
-            $user = null, $display_name = null, $backplane = false, $jquery_ready = false, $include_source = true
+        return $conv->toInitJS( $this->domain->getHost(), $this->site->getId(), $this->site->getKey(), 
+            $user = null, $displayName = null, $backplane = false, $jqueryReady = false, $includeSource = true
         );
     
     }
@@ -267,10 +267,10 @@ class Livefyre {
      * 
      * @return  string  The string representing the javascript loading code for Version 3
      */
-    public function livefyre_embed_code_v3() {
+    public function livefyreEmbedCodeV3() {
 
         $output = '';
-        $output .= 'fyre.conv.load(' . $this->get_global_config() . ', ' . $this->livefyre_conv_names();
+        $output .= 'fyre.conv.load(' . $this->getGlobalConfig() . ', ' . $this->livefyreConvNames();
         if ( isset( $this->onload ) ) {
             $output .= ', ' . $this->onload;
         }
@@ -283,11 +283,11 @@ class Livefyre {
      * 
      * @return  string  The string representation of a list of conversation names
      */
-    public function livefyre_conv_names() {
+    public function livefyreConvNames() {
 
         $output = '[';
         foreach ( $this->convs as $conv ) {
-            $output .= $conv->get_conv_name() . ', ';
+            $output .= $conv->getConvName() . ', ';
         }
         return substr($output, 0, ( strlen( $output ) - 2 ) ) . ']';
 
@@ -303,9 +303,9 @@ class Livefyre {
      * 
      * @return  string  The string representing the javascript loading code for Version 1
      */
-    public function generate_user_token( $u_id, $u_display_name, $duration ) {
+    public function generateUserToken( $uId, $uDisplayName, $duration ) {
         
-        $user = $this->domain->user( $u_id, $u_display_name );
+        $user = $this->domain->user( $uId, $uDisplayName );
         return $user->token( $duration );
 
     }
@@ -320,16 +320,16 @@ class Livefyre {
      * 
      * @return  string  The HTML code representing the conversation
      */
-    public function generate_bootstrap_html( $site_id, $article_id ) {
-        if( !isset( $site_id ) ) {
-            $site_id = $this->site->get_id();
+    public function generateBootstrapHtml( $siteId, $articleId ) {
+        if( !isset( $siteId ) ) {
+            $siteId = $this->site->getId();
         }
         // Check for null
-        $conv = $this->get_conv( $article_id );
+        $conv = $this->getConv( $articleId );
         if( !isset( $conv ) ) {
             return 'Cannot find conversation with that article ID.';
         }    
-        return $conv->to_html( $this->domain->get_host(), $site_id );
+        return $conv->toHtml( $this->domain->getHost(), $siteId );
     }
 
 }

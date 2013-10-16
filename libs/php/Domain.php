@@ -24,28 +24,28 @@ class Livefyre_Domain {
      *
      * @var string
      */
-    private $host;
+    private $_host;
 
     /**
      * Hash key for security function
      *
      * @var string
      */
-    private $key;
+    private $_key;
 
     /**
      * 
      *
      * @var string
      */
-    private $livefyre_tld;
+    private $_livefyreTLD;
 
     /**
      * Name of the Janrain Capture App
      *
      * @var string
      */
-    private $engage_app_name;
+    private $engageAppName;
 
     /**
      * Name of the AuthDelegate Javascript variable
@@ -73,23 +73,23 @@ class Livefyre_Domain {
      * @access public
      * @since Method available since Release 2.0.0
      */
-    public function __construct( $network, $key = null, $options, $http_api = null ) {
+    public function __construct( $network, $key = null, $options, $httpAPI = null ) {
         if ( isset( $options['livefyre_tld'] ) ) {
-            $this->livefyre_tld = $options['livefyre_tld'];
+            $this->setLivefyreTLD($options['livefyre_tld']);
         } else {
-            $this->livefyre_tld = LF_DEFAULT_TLD;
+            $this->setLivefyreTLD(LF_DEFAULT_TLD);
         }
         if ( isset( $options['engage_app_name'] ) ) {
-            $this->engage_app_name = $options['engage_app_name'];
+            $this->setEngageAppName($options['engage_app_name']);
         }
         if ( isset( $options['authDelegate'] ) ) {
-            $this->authDelegate = $options['authDelegate'];
+            $this->setAuthDelegate($options['authDelegate']);
         }
         if ( isset( $options['strings'] ) ) {
-            $this->strings = $options['strings'];
+            $this->setStrings($options['strings']);
         }
-        $this->host = $network;
-        $this->key = $key;
+        $this->setHost($network);
+        $this->setKey($key);
         if ( defined('LF_DEFAULT_HTTP_LIBRARY') ) {
             $httplib = LF_DEFAULT_HTTP_LIBRARY;
             $this->http = new $httplib;
@@ -100,21 +100,21 @@ class Livefyre_Domain {
     }
     
     /**
-     * Getter for the livefyre tld
+     * Getter for the Livefyre Top Level Domain
      * 
      * @return  string  Livefyre tld
      */
-    public function get_livefyre_tld() {
-        return $this->livefyre_tld;
+    public function getLivefyreTLD() {
+        return $this->_livefyreTLD;
     }
     
     /**
-     * Getter for the livefyre host
+     * Getter for the Livefyre host
      * 
      * @return  string  Livefyre host
      */
-    public function get_host() {
-        return $this->host;
+    public function getHost() {
+        return $this->_host;
     }
     
     /**
@@ -122,8 +122,8 @@ class Livefyre_Domain {
      * 
      * @return  string  Domain hash key
      */
-    public function get_key() {
-        return $this->key;
+    public function getKey() {
+        return $this->_key;
     }
     
     /**
@@ -131,8 +131,8 @@ class Livefyre_Domain {
      * 
      * @return  string  Janrain Engage App name
      */
-    public function get_engage_app() {
-        return $this->engage_app_name;
+    public function getEngageApp() {
+        return $this->_engageAppName;
     }
 
     /**
@@ -140,7 +140,7 @@ class Livefyre_Domain {
      * 
      * @return  string  Javascript auth delegate variable name
      */
-    public function get_authDelegate() {
+    public function getAuthDelegate() {
         return $this->authDelegate;
     }
 
@@ -152,8 +152,65 @@ class Livefyre_Domain {
      * 
      * @return  string[]    Array of replacement strings
      */
-    public function get_strings() {
+    public function getStrings() {
         return $this->strings;
+    }
+
+    /**
+     * Setter for the Livefyre Top Level Domain
+     * 
+     * @return  string  Livefyre tld
+     */
+    public function setLivefyreTLD($livefyreTLD) {
+        $this->_livefyreTLD = $livefyreTLD;
+    }
+    
+    /**
+     * Setter for the livefyre host
+     * 
+     * @return  string  Livefyre host
+     */
+    public function setHost($host) {
+        $this->_host = $host;
+    }
+    
+    /**
+     * Setter for the domain hash key
+     * 
+     * @return  string  Domain hash key
+     */
+    public function setKey($key) {
+        $this->_key = $key;
+    }
+    
+    /**
+     * Setter for the Jainrain Engage App Name
+     * 
+     * @return  string  Janrain Engage App name
+     */
+    public function setEngageApp($appName) {
+        $this->_engageAppName = $appName;
+    }
+
+    /**
+     * Setter for the Livefyre Javascript Auth Delegate variable name
+     * 
+     * @return  string  Javascript auth delegate variable name
+     */
+    public function setAuthDelegate($authDelegate) {
+        $this->_authDelegate = $authDelegate;
+    }
+
+    /**
+     * Setter for the strings array.
+     *
+     * Returns the array conainting the replacement values for the widget. This
+     * allows for string customization and localization.
+     * 
+     * @return  string[]    Array of replacement strings
+     */
+    public function setStrings($stringsName) {
+        $this->_strings = $stringsName;
     }
 
     /**
@@ -161,16 +218,8 @@ class Livefyre_Domain {
      * 
      * @return  User   Array of replacement strings
      */
-    public function user($uid, $display_name = null) {
-        return new Livefyre_User($uid, $this, $display_name);
-    }
-    
-    /**
-     * Not sure. Might be cut
-     */
-    public function push_user_data( $data ) {
-        $systemuser = $this->user( 'system' );
-        $systemuser->push( $data );
+    public function user($uid, $displayName = null) {
+        return new Livefyre_User($uid, $this, $displayName);
     }
     
     /**
@@ -182,36 +231,39 @@ class Livefyre_Domain {
      * @param   string  Url of the site to pull user data from
      * @return  User    Array of replacement strings
      */
-    public function set_pull_url( $url_template ) {
-        $request_url = 'http://' . $this->get_host() . '/?pull_profile_url=' . urlencode($url_template) . '&actor_token=' . $this->user('system')->token();
-        return $this->http->request( $request_url, array( 'method' => 'POST' ) );
+    public function setPullURL( $urlTemplate ) {
+        $requestURL = 'http://' . $this->getHost() . '/?pull_profile_url='
+            . urlencode($urlTemplate) . '&actor_token=' . $this->user('system')->token();
+        return $this->http->request( $requestURL, array( 'method' => 'POST' ) );
     }
     
-    public function set_user_affiliation( $user_id, $type, $scope = 'domain', $target_id = null ) {
-        $allowed_types = array( 'admin', 'member', 'none', 'outcast', 'owner' );
-        $allowed_scope = array( 'domain', 'site', 'conv' );
-        if ( !in_array( $type, $allowed_types ) ) {
-            trigger_error( 'You cannot set a Livefyre user\'s affiliation to a type other than the allowed: ' . implode( ', ', $allowed_types ), E_USER_ERROR );
+    public function setUserAffiliation( $userId, $type, $scope = 'domain', $targetId = null ) {
+        $allowedTypes = array( 'admin', 'member', 'none', 'outcast', 'owner' );
+        $allowedScope = array( 'domain', 'site', 'conv' );
+        if ( !in_array( $type, $allowedTypes ) ) {
+            trigger_error( 'You cannot set a Livefyre user\'s affiliation to a type other than the allowed: '
+                . implode( ', ', $allowedTypes ), E_USER_ERROR );
             return false;
         } else {
-            if ( !in_array( $scope, $allowed_scope ) ) {
-                trigger_error( 'You cannot set a Livefyre user\'s affiliation within a scope other than the allowed: ' . implode( ', ', $allowed_scope ), E_USER_ERROR );
+            if ( !in_array( $scope, $allowedScope ) ) {
+                trigger_error( 'You cannot set a Livefyre user\'s affiliation within a scope other than the allowed: '
+                    . implode( ', ', $allowedScope ), E_USER_ERROR );
                 return false;
             }
-            $user_jid = $user_id . '@' . $this->get_host();
+            $userJid = $userId . '@' . $this->getHost();
             $systemuser = $this->user( 'system' );
-            $request_url = 'http://' . $this->get_host() . '/api/v1.1/private/management/user/' . $user_jid . '/role/?lftoken=' . $this->user('system')->token();
-            $post_data = array(
+            $requestURL = 'http://' . $this->getHost() . '/api/v1.1/private/management/user/' . $userJid . '/role/?lftoken=' . $this->user('system')->token();
+            $postData = array(
                 'affiliation' => $type
             );
             if ($scope == 'domain') { 
-                $post_data['domain_wide'] = '1';
+                $postData['domain_wide'] = '1';
             } elseif ($scope == 'conv') {
-                $post_data['conv_id'] = $target_id;
+                $postData['conv_id'] = $targetId;
             } elseif ($scope == 'site') {
-                $post_data['site_id'] = $target_id;
+                $postData['site_id'] = $targetId;
             }
-            return $this->http->request( $request_url, array('method'=>'POST', 'data'=>$post_data) );
+            return $this->http->request( $requestURL, array('method'=>'POST', 'data'=>$postData) );
         }
         return false;
     }
@@ -221,8 +273,8 @@ class Livefyre_Domain {
      * 
      * @return   string     Domain level cookie name
      */
-    public function token_cookie_name() {
-        return LF_COOKIE_PREFIX . 'token_' . $this->get_host();
+    public function tokenCookieName() {
+        return LF_COOKIE_PREFIX . 'token_' . $this->getHost();
     }
     
     /**
@@ -230,8 +282,8 @@ class Livefyre_Domain {
      * 
      * @return   string     Display name cookie name
      */
-    public function dname_cookie_name() {
-        return LF_COOKIE_PREFIX . 'display_name_' . $this->get_host();
+    public function dnameCookieName() {
+        return LF_COOKIE_PREFIX . 'display_name_' . $this->getHost();
     }
     
     /**
@@ -243,15 +295,15 @@ class Livefyre_Domain {
      * @param   string  Epoch time cookie will expire
      * @param   string  Sets cookie security level
      */
-    public function set_token_cookie( $token, $cookie_path, $cookie_domain, $expire = null, $secure = false ) {
-        $this->set_cookie($this->token_cookie_name(), $token, $cookie_path, $cookie_domain, $expire, $secure = false);
+    public function setTokenCookie( $token, $cookiePath, $cookieDomain, $expire = null, $secure = false ) {
+        $this->setCookie($this->tokenCookieName(), $token, $cookiePath, $cookieDomain, $expire, $secure = false);
     }
     
-    public function set_display_name_cookie( $display_name, $cookie_path, $cookie_domain, $expire = null, $secure = false ) {
+    public function setDisplayNameCookie( $displayName, $cookiePath, $cookieDomain, $expire = null, $secure = false ) {
         if ($expire == null) {
             $expire = time() + 1210000;
         }
-        $this->set_cookie($this->dname_cookie_name(), $display_name, $cookie_path, $cookie_domain, $expire, $secure = false);
+        $this->setCookie($this->dnameCookieName(), $displayName, $cookiePath, $cookieDomain, $expire, $secure = false);
     }
     
     /**
@@ -264,11 +316,11 @@ class Livefyre_Domain {
      * @param   string  Epoch time cookie will expire
      * @param   string  Sets cookie security level
      */
-    public function set_cookie( $name, $value, $cookie_path, $cookie_domain, $expire = null, $secure = false ) {
+    public function setCookie( $name, $value, $cookiePath, $cookieDomain, $expire = null, $secure = false ) {
         if ( $expire == null ) {
             $expire = time() + 86400;
         }
-        setcookie( $name, $value, $expire, $cookie_path, $cookie_domain, $secure, false );
+        setcookie( $name, $value, $expire, $cookiePath, $cookieDomain, $secure, false );
     }
     
     /**
@@ -277,9 +329,9 @@ class Livefyre_Domain {
      * @param   string  Path of the cookie
      * @param   string  Cookie's domain
      */
-    public function clear_cookies( $cookie_path, $cookie_domain ) {
-        setcookie( $this->dname_cookie_name(), ' ', time() - 31536000, $cookie_path, $cookie_domain );
-        setcookie( $this->token_cookie_name(), ' ', time() - 31536000, $cookie_path, $cookie_domain );
+    public function clearCookies( $cookiePath, $cookieDomain ) {
+        setcookie( $this->dnameCookieName(), ' ', time() - 31536000, $cookiePath, $cookieDomain );
+        setcookie( $this->tokenCookieName(), ' ', time() - 31536000, $cookiePath, $cookieDomain );
     }
     
     /**
@@ -287,8 +339,8 @@ class Livefyre_Domain {
      * 
      * @return   string     Javascript library code
      */
-    public function source_js_v1() {
-        return '<script type="text/javascript" src="http://zor.' . $this->get_livefyre_tld() . '/wjs/v1.0/javascripts/livefyre_init.js"></script>';
+    public function sourceJSV1() {
+        return '<script type="text/javascript" src="http://zor.' . $this->getLivefyreTLD() . '/wjs/v1.0/javascripts/livefyre_init.js"></script>';
     }
     
     /**
@@ -296,8 +348,8 @@ class Livefyre_Domain {
      * 
      * @return   string     Javascript library code
      */
-    public function source_js_v3() {
-        return '<script type="text/javascript" src="http://zor.' . $this->get_livefyre_tld() . '/wjs/v3.0/javascripts/livefyre.js"></script>';
+    public function sourceJSV3() {
+        return '<script type="text/javascript" src="http://zor.' . $this->getLivefyreTLD() . '/wjs/v3.0/javascripts/livefyre.js"></script>';
     }
     
 
@@ -309,15 +361,15 @@ class Livefyre_Domain {
      * @param   string  Token cookie's name
      * @param   string  Domain cookie's name
      */
-    public function authenticate_js( $token_url = '', $cookie_path = '/', $token_cookie = null, $dname_cookie = null  ) {
+    public function authenticateJS( $tokenURL = '', $cookiePath = '/', $tokenCookie = null, $dnameCookie = null  ) {
         
         /*
             This script should be rendered when it appears the user is logged in
             Now we attempt to fetch Livefyre credentials from a cookie,
             falling back to ajax as needed.
         */
-        $token_cookie = $token_cookie ? $token_cookie : $this->token_cookie_name();
-        $dname_cookie = $dname_cookie ? $dname_cookie : $this->dname_cookie_name();
+        $tokenCookie = $tokenCookie ? $tokenCookie : $this->tokenCookieName();
+        $dnameCookie = $dnameCookie ? $dnameCookie : $this->dnameCookieName();
         ?>
             <script type="text/javascript">
                 LF.ready(function() {
@@ -370,14 +422,14 @@ class Livefyre_Domain {
      * @param   string  Token cookie's name
      * @param   string  Domain cookie's name
      */
-    public function authenticate_js_v3( $token_url = '', $cookie_path = '/', $token_cookie = null, $dname_cookie = null  ) {
+    public function authenticateJSV3( $tokenURL = '', $cookiePath = '/', $tokenCookie = null, $dnameCookie = null  ) {
         
         /*
             This script should be rendered when it appears the user is logged in
             Now we attempt to fetch Livefyre credentials from a cookie,
             falling back to ajax as needed.
         */
-        $token_cookie = $token_cookie ? $token_cookie : $this->token_cookie_name();
+        $tokenCookie = $tokenCookie ? $tokenCookie : $this->tokenCookieName();
         //$dname_cookie = $dname_cookie ? $dname_cookie : $this->dname_cookie_name();
         ?>
             <script type="text/javascript">
@@ -425,9 +477,9 @@ class Livefyre_Domain {
      *
      * @param   string  Token to check
      */
-    public function validate_system_token($token) {
+    public function validateSystemToken($token) {
         // This replaces the below - it uses JWT to verify that the token is valid for user id = 'system'
-        return lftokenValidateSystemToken($token, $this->get_key(), $this->get_host());
+        return lftokenValidateSystemToken($token, $this->getKey(), $this->getHost());
     }
 
     /**
@@ -435,8 +487,8 @@ class Livefyre_Domain {
      *
      * @param   string  Token to check
      */
-    public function validate_server_token($token) {
-        return lftokenValidateServerToken($token, $this->get_key());
+    public function validateServerToken($token) {
+        return lftokenValidateServerToken($token, $this->getKey());
     }
 
     /**
@@ -451,8 +503,8 @@ class Livefyre_Domain {
         // This replaces the below - it uses JWT to verify that the token is valid for user id = 'system'
         $payload = JWT::decode($token, $key);
         $required = array('expires','user_id','domain');
-        foreach ($required as $field_name) {
-            if ( !isset($payload->$field_name) ) {
+        foreach ($required as $fieldName) {
+            if ( !isset($payload->$fieldName) ) {
                 return false;
             }
         }

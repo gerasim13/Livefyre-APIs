@@ -8,71 +8,99 @@ require_once dirname(__FILE__) . '/JWT.php';
  * @author     Livefyre Inc <a href="http://www.livefyre.com">Livefyre</a>
  * @author     Mike Soldner, Derek Chinn
  */
-class Livefyre_Conversation {
+class Livefyre_Conversation 
+{
 
     /**
      * Livefyre Conversation Identifier
      *
      * @var string
      */
-    private $article_id;
+    private $_articleId;
 
     /**
      * Livefyre Conversation variable name
      *
      * @var string
      */
-    private $conv_name;
+    private $_convName;
 
     /**
      * Livefyre Article title
      *
      * @var string
      */
-    private $title;
+    private $_title;
 
     /**
      * Livefyre Article tags
      *
+     * @var array
+     */
+    private $_tags;
+
+    /**
+     * Livefyre Target Element
+     *
      * @var string
      */
-    private $tags;
+    private $_el;
+
+    /**
+     * Livefyre Source URL
+     *
+     * @var string
+     */
+    private $_url;
     
 
     /**
-     * @param string    site identifier
-     * @param string    site hash key
-     * @param string    site hash key
-     * @param string    site hash key
-     * @param string    site hash key
-     * @param string    site hash key
+     * @param   string  Livefyre target element
+     * @param   string  Unique article ID
+     * @param   string  Name of the Covnersation JS variable
+     * @param   array   Article tags
+     * @param   string  Source URL of the Conversation
+     * @param   string  Article title
      *
      * @access public
      * @since Method available since Release 2.0.0
      */
-    public function __construct( $el, $article_id, $conv_name, $tags = null, $url, $title ) {
-        $this->el = $el;
-        $this->article_id = $article_id;
-        $this->conv_name = $conv_name;
-        $this->tags = $tags;
-        $this->title = $title;
+    public function __construct( $el, $articleId, $convName, 
+        $tags = null, $url, $title
+    ) {
+        $this->setElememt($el);
+        $this->setArticleId($articlIid);
+        $this->setConvName($convName);
+        $this->setTags($tags);
+        $this->setURL($url);
+        $this->setTitle($title);
         if ( defined('LF_DEFAULT_HTTP_LIBRARY') ) {
             $httplib = LF_DEFAULT_HTTP_LIBRARY;
             $this->http = new $httplib;
-        }
-        else {
+        } else {
             require_once dirname(__FILE__) . '/Http.php';
             $this->http = new Livefyre_http; 
         }
     }
 
     /**
-     * Getter for the Livefyre Conversation Identifier
+     * Wrapper for deprecated method
      * 
-     * @return  string     Livefyre Conversation Identifier
+     * @deprecated
      */
-    public function get_article_id() {
-        return $this->article_id;
+    public function get_article_id()
+    {
+        return $this->getArticleId();
+    }
+
+    /**
+     * Getter for Livefyre Article Identifier
+     * 
+     * @return  string  Livefyre Article Identifier
+     */
+    public function getArticleId()
+    {
+        return $this->_articleId;
     }
 
     /**
@@ -80,17 +108,49 @@ class Livefyre_Conversation {
      * 
      * @param   string  Id to set Conversation Identifier to
      */
-    public function set_article_id( $id ) {
-        $this->id = $id;
+    public function setURL( $url )
+    {
+        $this->_url = $id;
+    }
+
+    /**
+     * Getter for Livefyre Article Identifier
+     * 
+     * @return  string  Livefyre Article Identifier
+     */
+    public function getURL()
+    {
+        return $this->_url;
+    }
+
+    /**
+     * Setter for Conversation Identifier
+     * 
+     * @param   string  Id to set Conversation Identifier to
+     */
+    public function setArticleId( $id )
+    {
+        $this->_id = $id;
+    }
+
+    /**
+     * Getter for Conversation Identifier
+     * 
+     * @return  string  Livefyre Conversation Identifier
+     */
+    public function getArticleId( $id )
+    {
+        return $this->_id;
     }
     
     /**
-     * Getter for the Livefyre Site Identifier
+     * Getter for the Conversation Name
      * 
-     * @return  string     Livefyre Site Identifier
+     * @return  string  Conversation Name
      */
-    public function get_conv_name() {
-        return $this->conv_name;
+    public function getConvName()
+    {
+        return $this->_convName;
     }
 
     /**
@@ -98,8 +158,9 @@ class Livefyre_Conversation {
      * 
      * @param   string  Conversation name to set
      */
-    public function set_conv_name( $conv_name ) {
-        $this->conv_name = $conv_name;
+    public function setConvName( $convName )
+    {
+        $this->_convName = $convName;
     }
 
     /**
@@ -113,8 +174,9 @@ class Livefyre_Conversation {
      * 
      * @return  string     Livefyre element
      */
-    public function get_element() {
-        return $this->el;
+    public function getElement()
+    {
+        return $this->_el;
     }
 
     /**
@@ -128,8 +190,9 @@ class Livefyre_Conversation {
      *
      * @param   string  Element to set Conversation element to
      */
-    public function set_elememt( $element ) {
-        $this->el = $element;
+    public function setElememt( $element )
+    {
+        $this->_el = $element;
     }
 
     /**
@@ -137,8 +200,9 @@ class Livefyre_Conversation {
      * 
      * @return  string     Livefyre Article Title
      */
-    public function get_title() {
-        return $this->title;
+    public function getTitle()
+    {
+        return $this->_title;
     }
 
     /**
@@ -146,8 +210,9 @@ class Livefyre_Conversation {
      * 
      * @param   string  Title to set the Conversation to
      */
-    public function set_title( $title ) {
-        $this->title = $title;
+    public function setTitle( $title )
+    {
+        $this->_title = $title;
     }
 
     /**
@@ -155,17 +220,22 @@ class Livefyre_Conversation {
      * 
      * @return  string[]   Livefyre Article tags
      */
-    public function get_tags() {
-        return $this->tags;
+    public function getTags()
+    {
+        return $this->_tags;
     }
 
     /**
-     * Setter for Site Identifier
+     * Setter for Livefyre Article tags
      * 
      * @param   string[]    Array to set the tags to
      */
-    public function set_tags( $tags ) {
-        $this->tags = $tags;
+    public function setTags( $tags )
+    {
+        if (!is_array($tags)) {
+            return "Tags must be an array of strings";
+        }
+        $this->_tags = $tags;
     }
 
     /**
@@ -175,27 +245,50 @@ class Livefyre_Conversation {
      *                  the code to run authentication
      * @param   string  Code snippet that handles authentication    
      */
-    public function add_js_delegate( $delegate_name, $code ) {
-        $this->delegates[ $delegate_name ] = $code;
+    public function addJSDelegate( $delegateName, $code )
+    {
+        $this->delegates[ $delegateName ] = $code;
+    }
+
+    /**
+     * Wrapper for out of date method
+     *
+     * @deprecated
+     */
+    public function add_js_delegate( $delegate_name="authDelegate", $code )
+    {
+        $this->addJSDelegate( $delegate_name, $code );
     }
     
     /**
-     * Old way of handling autheDelegates for Version 1
+     * Old way of handling authDelegates for Version 1
      * Deprecated
      * 
      * @deprecated
      * @param   string[]    Array to set the tags to
      */
-    public function render_js_delegates() {
-        $str_out = '';
+    public function renderJSDelegates()
+    {
+        $strOut = '';
         if ( $this->delegates ) {
             $str_out = "var livefyreConvDelegates = {\n";
             foreach ($this->delegates as $handler => $code) {
-                $str_out .= "    handle_$handler: " . $code . ", \n";
+                $strOut .= "    handle_$handler: " . $code . ", \n";
             }
-            $str_out .= "}\nLF.ready( function() { LF.Dispatcher.addListener(livefyreConvDelegates); } )";
+            $strOut .= "}\nLF.ready( function() 
+                { LF.Dispatcher.addListener(livefyreConvDelegates); } )";
         }
-        return $str_out;
+        return $strOut;
+    }
+
+    /**
+     * Wrapper for out of date method
+     *
+     * @deprecated
+     */
+    public function render_js_delegate()
+    {
+        return $this->renderJSDelegate();
     }
 
     /**
@@ -211,55 +304,79 @@ class Livefyre_Conversation {
      * @param   string  Use backplane flag
      * @param   string  jQuery loaded on the page flag
      */
-    public function to_initjs( $host, $site_id, $site_key, $user = null, $display_name = null, $backplane = false, $jquery_ready = false) {
+    public function toInitJS( $host, $siteId, $siteKey, $user = null, 
+        $displayName = null, $backplane = false, $jqueryReady = false
+    ) {
         /*
             **DEPRECATED**
-            Please use to_initjs_v3() if you are on Livefyre comments V3
+            Please use toInitJSv3() if you are on Livefyre comments V3
         */
-        $network_name = $host;
-        $site_id = $site_id;
-        $site_key = $site_key;
+        $networkName = $host;
+        $site_id = $siteId;
+        $site_key = $siteKey;
         $config = array(
-            'site_id' => $site_id,
-            'article_id' => $this->article_id
+            'site_id' => $siteId,
+            'article_id' => $this->getArticleId()
         );
-        $builds_token = true;
-        if ( $network_name != LF_DEFAULT_PROFILE_DOMAIN ) {
-            $config[ 'domain' ] = $network_name;
+        $buildsToken = true;
+        if ( $networkName != LF_DEFAULT_PROFILE_DOMAIN ) {
+            $config[ 'domain' ] = $networkName;
         } else {
             // nobody but Livefyre can build tokens for livefyre.com profiles
-            $builds_token = false;
+            $buildsToken = false;
         }
-        $article_url = $this->url;
-        $article_title = $this->title;
-        if ( !empty($site_key) && !empty($article_url) && !empty($article_title) ) {
+        $articleURL = $this->getURL();
+        $articleTitle = $this->getTitle();
+        if ( !empty($siteKey) && !empty($articleURL) && !empty($articleTitle) ) {
             // Produce a conv meta checksum if we have enough data
-            $sig_fields = array($config['article_id'], $article_url, $article_title, $site_key);
+            $sigFields = array(
+                $config['articleId'],
+                $articleURL,
+                $articleTitle,
+                $siteKey
+            );
             $config['conv_meta'] = array(
-                'article_url' => $article_url,
-                'title' => $article_title,
-                'sig' => md5(implode(',', $sig_fields))
+                'article_url' => $articleURL,
+                'title' => $articleTitle,
+                'sig' => md5(implode(',', $sigFields))
             );
         }
         if ( $backplane ) {
-            $add_backplane = 'if ( typeof(Backplane) != \'undefined\' ) { lf_config.backplane = Backplane; };';
+            $addBackplane = 'if ( typeof(Backplane) != \'undefined\' ) 
+                { lf_config.backplane = Backplane; };';
         } else {
-            $add_backplane = '';
+            $addBackplane = '';
         }
-        $login_js = '';
-        if ( $user && $builds_token ) {
-            $login_json = array( 'token' => $user->token( ), 'profile' => array('display_name' => $display_name) );
-            $login_json_str = json_encode( $login_json );
-            $login_js = "LF.ready( function() {LF.login($login_json_str);} );";
+        $loginJS = '';
+        if ( $user && $buildsToken ) {
+            $loginJSON = array( 
+                'token' => $user->token( ), 
+                'profile' => array(
+                    'display_name' => $displayName
+                )
+            );
+            $loginJSONStr = json_encode( $loginJSON );
+            $loginJS = "LF.ready( function() {LF.login($login_json_str);} );";
         }
-        return '' . ($jquery_ready ? 'jQuery(function(){' : '') . '
+        return '' . ($jqueryReady ? 'jQuery(function(){' : '') . '
                 var lf_config = ' . json_encode( $config ) . ';
-                ' . $add_backplane . '
+                ' . $addBackplane . '
                 var conv = LF(lf_config);
-                ' . $login_js . '
-                ' . $this->render_js_delegates() . '
-                ' . ($jquery_ready ? '});' : '') . '
+                ' . $loginJS . '
+                ' . $this->renderJSDelegates() . '
+                ' . ($jqueryReady ? '});' : '') . '
             ';
+    }
+
+    /**
+     * Wrapper for out of date method
+     *
+     * @deprecated
+     */
+    public function to_initjs( $user = null, $display_name = null, $backplane = false, $jquery_ready = false, $include_source = true )
+    {
+        return $this->toInitJS( $user = null, $display_name = null, $backplane = false, $jquery_ready = false, $include_source = true );
+
     }
     
     /**
@@ -268,13 +385,14 @@ class Livefyre_Conversation {
      * @param   string  Site key
      * @return  string  JWT string representing the conversation data
      */
-    public function collection_meta( $site_key ) {
+    public function collectionMeta( $siteKey )
+    {
 
-        $collectionMeta = array("title" => $this->title,
-                "url" => $this->url,
-                "tags" => $this->tags
+        $collectionMeta = array("title" => $this->getTitle(),
+                "url" => $this->getURL(),
+                "tags" => implode(",", $this->getTags())
             );
-        $jwtString = JWT::encode( $collectionMeta, $site_key );
+        $jwtString = JWT::encode( $collectionMeta, $siteKey );
         return $jwtString;
     }
 
@@ -287,35 +405,41 @@ class Livefyre_Conversation {
      * @param   string  Site ID
      * @return  string  Array of collection information for Conversation loading
      */
-    public function get_conv_config( $site_key, $site_id ) {
+    public function getConvConfig( $siteKey, $siteId )
+    {
 
-        $collectionMeta = $this->collection_meta( $site_key );
+        $collectionMeta = $this->collectionMeta( $siteKey );
         return array(
             'collectionMeta' => $collectionMeta,
             'checksum' => md5( $collectionMeta ),
-            'siteId' => $site_id,
-            'articleId' => $this->article_id,
-            'el' => $this->el
+            'siteId' => $siteId,
+            'articleId' => $this->_articleId,
+            'el' => $this->_el
         );
     }
     
     /**
      * Grabs HTML version of the widget for caching and speed purposes
      * 
-     * Contains all the information to load a site into the Livefyre application. This is used
-     * to cache a version of the plugin for better loading times. The stream will appear on the
+     * Contains all the information to load a site into the Livefyre 
+     * application. This is used to cache a version of the plugin for better
+     * loading times. The stream will appear on the
      * page statically and then, when the Javascript loads, will become live.
      *
      * @param   string  Site key
      * @param   string  Site ID
      * @return  string  HTML representation of the Conversation
      */
-    public function to_html( $host, $site_id ) {
+    public function toHTML( $host, $siteId )
+    {
 
-        $article_id_b64 = urlencode( base64_encode( $this->article_id ) );
-        $url = "http://bootstrap.$host/api/v1.1/public/bootstrap/html/$site_id/$article_id_b64.html";
+        $articleIdB64 = urlencode( base64_encode( $this->_articleId ) );
+        $url = "http://bootstrap.$host
+            /api/v1.1/public/bootstrap/html/$site_id/$article_id_b64.html";
         $result = $this->http->request($url, array('method' => 'GET'));
-        if (is_array( $result ) && isset($result['response']) && $result['response']['code'] == 200) {
+        if (is_array( $result )
+            && isset($result['response'])
+            && $result['response']['code'] == 200) {
             return $result['body'];
         } else {
             return false;

@@ -12,14 +12,14 @@ class Livefyre_Token {
      * @param   int     Maximum age for the token's life span    
      * @return  string  JWT encoded Livefyre token
      */
-    static function from_user($user, $max_age=LFTOKEN_MAX_AGE) {
-        $secret = $user->get_domain()->get_key();
+    static function fromUser($user, $maxAge=LFTOKEN_MAX_AGE) {
+        $secret = $user->getDomain()->getKey();
         $args = array(
-            'domain' => $user->get_domain()->get_host(), 
-            'user_id' => $user->get_uid(),
-            'expires' => time() + $max_age
+            'domain'    => $user->get_domain()->get_host(), 
+            'user_id'   => $user->getUid(),
+            'expires'   => time() + $max_age
         );
-        $dname = $user->get_display_name();
+        $dname = $user->getDisplayName();
         if (!empty($dname)) {
             $args['display_name'] = $dname;
         }
@@ -44,16 +44,16 @@ class Livefyre_Token {
      * @param   string  The data to hash    
      * @return  string  HMAC-SHA1'ed string
      */
-    function hmacsha1($key,$data) {
-        $blocksize=64;
-        $hashfunc='sha1';
-        if (strlen($key)>$blocksize) {
-            $key=pack('H*', $hashfunc($key));
+    function hmacsha1($key, $data) {
+        $blocksize = 64;
+        $hashfunc = 'sha1';
+        if (strlen($key) > $blocksize) {
+            $key = pack('H*', $hashfunc($key));
         }
-        $key=str_pad($key,$blocksize,chr(0x00));
-        $ipad=str_repeat(chr(0x36),$blocksize);
-        $opad=str_repeat(chr(0x5c),$blocksize);
-        $hmac = pack( 'H*',$hashfunc( ($key^$opad).pack( 'H*',$hashfunc( ($key^$ipad).$data ) ) ) );
+        $key = str_pad($key,$blocksize,chr(0x00));
+        $ipad = str_repeat(chr(0x36),$blocksize);
+        $opad = str_repeat(chr(0x5c),$blocksize);
+        $hmac = pack('H*', $hashfunc(($key^$opad).pack('H*', $hashfunc(($key ^ $ipad) . $data))));
         return $hmac;
     }
 
@@ -64,10 +64,10 @@ class Livefyre_Token {
      * @param   array   Maximum age for the token's life span    
      * @return  string  List of results of the XOR
      */
-    private function xor_these($first, $second) {
-        $results=array();
-        for ($i=0; $i < strlen($first); $i++) {
-            array_push($results, $first[$i]^$second[$i]);
+    private function xorThese($first, $second) {
+        $results = array();
+        for ($i = 0; $i < strlen($first); $i++) {
+            array_push($results, $first[$i] ^ $second[$i]);
         }
         return implode($results);
     }
@@ -78,7 +78,7 @@ class Livefyre_Token {
      * @param   string  String to check for commas  
      * @return  bool    Whether or not the strings has commas
      */
-    function Livefyre_hasNoComma($str) {
+    function livefyreHasNoComma($str) {
         return !preg_match('/\,/', $str);
     }
 
@@ -90,14 +90,14 @@ class Livefyre_Token {
      * @param   array   List of token args
      * @return  string  Livefyre token data
      */
-    function lftokenCreateData($now, $duration, $args=array()) {
+    function lfTokenCreateData($now, $duration, $args=array()) {
         $filtered_args = array_filter($args, 'Livefyre_hasNoComma');
-        if (count($filtered_args)==0 or count($args)>count($filtered_args)) {
+        if (count($filtered_args) == 0 or count($args) > count($filtered_args)) {
             return -1;
         }
 
         array_unshift($filtered_args, "lftoken", $now, $duration);
-        $data=implode(',',$filtered_args);
+        $data = implode(',',$filtered_args);
         return $data;
     }
 
@@ -108,14 +108,14 @@ class Livefyre_Token {
      * @param   string  Key to hash with
      * @return  string  Livefyre user token ecoded with base64
      */
-    function lftokenCreateToken($data, $key) {
+    function lfTokenCreateToken($data, $key) {
         //Create a signed token from data
         $clientkey = $this->hmacsha1($key,"Client Key");
         $clientkey_sha1 = sha1($clientkey, true);
         $temp = $this->hmacsha1($clientkey_sha1,$data);
-        $sig = $this->xor_these($temp,$clientkey);
+        $sig = $this->xorThese($temp,$clientkey);
         $base64sig = base64_encode($sig);
-        return base64_encode(implode(",",array($data,$base64sig)));
+        return base64_encode(implode(",", array($data, $base64sig)));
     }
 }
 

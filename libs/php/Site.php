@@ -13,14 +13,14 @@ class Livefyre_Site {
      *
      * @var string
      */
-    private $id;
+    private $_id;
 
     /**
      * Livefyre Site Key
      *
      * @var string
      */
-    private $key;
+    private $_key;
     
     /**
      * @param string    Site identifier
@@ -30,8 +30,8 @@ class Livefyre_Site {
      * @since Method available since Release 2.0.0
      */
     public function __construct($id, $key) {
-        $this->id = $id;
-        $this->key = $key;
+        $this->_id = $id;
+        $this->_key = $key;
     }
     
     /**
@@ -39,8 +39,8 @@ class Livefyre_Site {
      * 
      * @return  string  Livefyre Site Identifier
      */
-    public function get_id() {
-        return $this->id;
+    public function getId() {
+        return $this->_id;
     }
 
     /**
@@ -48,8 +48,8 @@ class Livefyre_Site {
      * 
      * @param   string  Id to set Site Identifier to
      */
-    public function set_id( $id ) {
-        $this->id = $id;
+    public function setId( $id ) {
+        $this->_id = $id;
     }
     
     /**
@@ -57,8 +57,8 @@ class Livefyre_Site {
      * 
      * @return  string  Livefyre Site key
      */
-    public function get_key() {
-        return $this->key;
+    public function getKey() {
+        return $this->_key;
     }
 
     /**
@@ -66,8 +66,8 @@ class Livefyre_Site {
      * 
      * @param   string  Key to set the Site Key to
      */
-    public function set_key( $key ) {
-        $this->key = $key;
+    public function setKey( $key ) {
+        $this->_key = $key;
     }
 }
 
