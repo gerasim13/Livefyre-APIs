@@ -1,32 +1,73 @@
 <?php
 
-include( dirname(__FILE__) . '/Article.php' );
-
+/**
+ * Livefyre Class representing a Livefyre Site
+ *
+ * @author     Livefyre Inc <a href="http://www.livefyre.com">Livefyre</a>
+ * @author     Mike Soldner, Derek Chinn
+ */
 class Livefyre_Site {
-    private $id;
-    private $domain;
-    private $key;
+
+    /**
+     * Livefyre Site Identifier
+     *
+     * @var string
+     */
+    private $_id;
+
+    /**
+     * Livefyre Site Key
+     *
+     * @var string
+     */
+    private $_key;
     
-    public function __construct($id, $key, $domain) {
-        $this->id = $id;
-        $this->key = $key;
-        $this->domain = $domain;
+    /**
+     * @param string    Site identifier
+     * @param string    Site hash key
+     *
+     * @access public
+     * @since Method available since Release 2.0.0
+     */
+    public function __construct($id, $key) {
+        $this->_id = $id;
+        $this->_key = $key;
     }
     
-    public function article($article_id, $url, $title, $tags = "") {
-        return new Livefyre_Article($article_id, $this, $url, $title, $tags);
+    /**
+     * Getter for the Livefyre Site Identifier
+     * 
+     * @return  string  Livefyre Site Identifier
+     */
+    public function getId() {
+        return $this->_id;
+    }
+
+    /**
+     * Setter for Site Identifier
+     * 
+     * @param   string  Id to set Site Identifier to
+     */
+    public function setId( $id ) {
+        $this->_id = $id;
     }
     
-    public function get_domain() {
-        return $this->domain;
+    /**
+     * Getter for the Livefyre Site Key
+     * 
+     * @return  string  Livefyre Site key
+     */
+    public function getKey() {
+        return $this->_key;
     }
-    
-    public function get_id() {
-        return $this->id;
-    }
-    
-    public function get_key() {
-        return $this->key;
+
+    /**
+     * Setter for the Site Key
+     * 
+     * @param   string  Key to set the Site Key to
+     */
+    public function setKey( $key ) {
+        $this->_key = $key;
     }
 }
 
